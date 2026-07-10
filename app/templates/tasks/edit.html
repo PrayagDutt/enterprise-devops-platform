@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Edit Task — DevOps Task Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1">
+        <li class="breadcrumb-item"><a href="{{ url_for('tasks.index') }}" id="breadcrumb-tasks">Tasks</a></li>
+        <li class="breadcrumb-item active">Edit Task</li>
+      </ol>
+    </nav>
+    <h1 class="page-title">Edit Task</h1>
+    <p class="page-subtitle text-muted">ID #{{ task.id }} — created {{ task.created_at.strftime('%b %d, %Y') }}</p>
+  </div>
+  <!-- Quick delete from edit page -->
+  <button
+    type="button"
+    class="btn btn-outline-danger"
+    id="btn-delete-from-edit"
+    onclick="confirmDelete({{ task.id }}, '{{ task.title | e }}')"
+  >
+    <i class="bi bi-trash3 me-2"></i>Delete
+  </button>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8 col-xl-7">
+    <div class="panel" id="panel-edit-task">
+      <div class="panel-body">
+
+        <form method="POST" action="{{ url_for('tasks.edit', task_id=task.id) }}" novalidate id="edit-task-form">
+          {{ form.hidden_tag() }}
+
+          {% include "tasks/_form_fields.html" %}
+
+          <div class="d-flex gap-3 mt-4">
+            {{ form.submit(class="btn btn-primary btn-lg btn-glow px-5", id="btn-submit-edit") }}
+            <a href="{{ url_for('tasks.index') }}" class="btn btn-outline-secondary btn-lg" id="btn-cancel-edit">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete Confirmation Modal ─────────────────────────────────────────── -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-glass">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="deleteModalLabel">
+          <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Delete Task
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete <strong id="delete-task-name"></strong>?
+        <p class="text-muted small mt-2 mb-0">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-delete" data-bs-dismiss="modal">Cancel</button>
+        <form id="delete-form" method="POST" action="" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button type="submit" class="btn btn-danger" id="btn-confirm-delete">
+            <i class="bi bi-trash3 me-1"></i>Delete
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

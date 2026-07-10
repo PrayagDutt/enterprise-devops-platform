@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}New Task — DevOps Task Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1">
+        <li class="breadcrumb-item"><a href="{{ url_for('tasks.index') }}" id="breadcrumb-tasks">Tasks</a></li>
+        <li class="breadcrumb-item active">New Task</li>
+      </ol>
+    </nav>
+    <h1 class="page-title">Create New Task</h1>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8 col-xl-7">
+    <div class="panel" id="panel-create-task">
+      <div class="panel-body">
+
+        <form method="POST" action="{{ url_for('tasks.create') }}" novalidate id="create-task-form">
+          {{ form.hidden_tag() }}
+
+          {% include "tasks/_form_fields.html" %}
+
+          <!-- Action buttons -->
+          <div class="d-flex gap-3 mt-4">
+            {{ form.submit(class="btn btn-primary btn-lg btn-glow px-5", id="btn-submit-create") }}
+            <a href="{{ url_for('tasks.index') }}" class="btn btn-outline-secondary btn-lg" id="btn-cancel-create">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

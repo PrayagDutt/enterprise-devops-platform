@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="DevOps Task Manager — track, manage, and prioritise your engineering tasks with ease." />
+  <meta name="author" content="DevOps Task Manager" />
+
+  <title>{% block title %}{{ title | default('Dashboard') }} — DevOps Task Manager{% endblock %}</title>
+
+  <!-- Bootstrap 5 CSS (dark theme compatible) -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}" />
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  SIDEBAR NAVIGATION                                                      -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+{% if current_user.is_authenticated %}
+<div class="sidebar" id="sidebar">
+
+  <!-- Brand / Logo -->
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <i class="bi bi-kanban-fill"></i>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">DevOps</span>
+      <span class="brand-sub">Task Manager</span>
+    </div>
+  </div>
+
+  <hr class="sidebar-divider" />
+
+  <!-- Navigation links -->
+  <nav class="sidebar-nav">
+    <ul class="nav flex-column gap-1">
+
+      <li class="nav-item">
+        <a
+          href="{{ url_for('main.dashboard') }}"
+          id="nav-dashboard"
+          class="nav-link sidebar-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}"
+        >
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          href="{{ url_for('tasks.index') }}"
+          id="nav-tasks"
+          class="nav-link sidebar-link {% if request.blueprint == 'tasks' %}active{% endif %}"
+        >
+          <i class="bi bi-check2-square"></i>
+          <span>My Tasks</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          href="{{ url_for('tasks.create') }}"
+          id="nav-new-task"
+          class="nav-link sidebar-link {% if request.endpoint == 'tasks.create' %}active{% endif %}"
+        >
+          <i class="bi bi-plus-circle"></i>
+          <span>New Task</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+
+  <!-- Spacer pushes user section to bottom -->
+  <div class="sidebar-footer">
+    <hr class="sidebar-divider" />
+
+    <!-- Health status indicator -->
+    <div class="sidebar-health mb-3">
+      <a href="/health" id="nav-health" target="_blank" class="nav-link sidebar-link sidebar-link-sm">
+        <i class="bi bi-heart-pulse text-success"></i>
+        <span>System Health</span>
+      </a>
+    </div>
+
+    <!-- User profile summary -->
+    <div class="sidebar-user">
+      <div class="user-avatar">
+        {{ current_user.username[0].upper() }}
+      </div>
+      <div class="user-info">
+        <div class="user-name">{{ current_user.username }}</div>
+        <div class="user-email">{{ current_user.email }}</div>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" id="btn-logout" class="btn-logout" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- Mobile sidebar backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  MAIN CONTENT AREA                                                       -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div class="main-wrapper {% if current_user.is_authenticated %}with-sidebar{% endif %}">
+
+  {% if current_user.is_authenticated %}
+  <!-- Top bar (mobile) -->
+  <header class="topbar d-lg-none">
+    <button class="btn btn-ghost btn-sm" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+      <i class="bi bi-list fs-5"></i>
+    </button>
+    <span class="topbar-title">DevOps Task Manager</span>
+    <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-sm" aria-label="Sign out">
+      <i class="bi bi-box-arrow-right"></i>
+    </a>
+  </header>
+  {% endif %}
+
+  <!-- Page content -->
+  <main class="page-content">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container" id="flash-container">
+          {% for category, message in messages %}
+            <div
+              class="alert alert-{{ category }} alert-dismissible fade show flash-alert"
+              role="alert"
+              id="flash-{{ loop.index }}"
+            >
+              <i class="bi
+                {% if category == 'success' %}bi-check-circle-fill
+                {% elif category == 'danger' %}bi-exclamation-triangle-fill
+                {% elif category == 'warning' %}bi-exclamation-circle-fill
+                {% else %}bi-info-circle-fill{% endif %}
+                me-2"></i>
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+  </main>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  SCRIPTS                                                                 -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- Bootstrap 5 JS bundle (includes Popper) -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmEAbMkLG/W9B8RTd0lMgJWsdKja"
+  crossorigin="anonymous"
+></script>
+<!-- Custom scripts -->
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

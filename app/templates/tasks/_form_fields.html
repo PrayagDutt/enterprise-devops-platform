@@ -1,0 +1,70 @@
+{# tasks/_form_fields.html — Shared form fields partial
+   Included by both create.html and edit.html to keep field markup DRY.
+   The form object must be available in the template context.
+#}
+
+<!-- Title -->
+<div class="mb-4">
+  {{ form.title.label(class="form-label fw-semibold") }}
+  {{ form.title(
+      class="form-control form-control-lg" + (" is-invalid" if form.title.errors else ""),
+      id="input-title"
+    )
+  }}
+  {% for error in form.title.errors %}
+    <div class="invalid-feedback">{{ error }}</div>
+  {% endfor %}
+</div>
+
+<!-- Description -->
+<div class="mb-4">
+  {{ form.description.label(class="form-label fw-semibold") }}
+  {{ form.description(
+      class="form-control" + (" is-invalid" if form.description.errors else ""),
+      id="input-description"
+    )
+  }}
+  {% for error in form.description.errors %}
+    <div class="invalid-feedback">{{ error }}</div>
+  {% endfor %}
+</div>
+
+<!-- Status & Priority in a row -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6">
+    {{ form.status.label(class="form-label fw-semibold") }}
+    {{ form.status(
+        class="form-select" + (" is-invalid" if form.status.errors else ""),
+        id="select-status"
+      )
+    }}
+    {% for error in form.status.errors %}
+      <div class="invalid-feedback">{{ error }}</div>
+    {% endfor %}
+  </div>
+  <div class="col-sm-6">
+    {{ form.priority.label(class="form-label fw-semibold") }}
+    {{ form.priority(
+        class="form-select" + (" is-invalid" if form.priority.errors else ""),
+        id="select-priority"
+      )
+    }}
+    {% for error in form.priority.errors %}
+      <div class="invalid-feedback">{{ error }}</div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Due Date -->
+<div class="mb-2">
+  {{ form.due_date.label(class="form-label fw-semibold") }}
+  {{ form.due_date(
+      class="form-control" + (" is-invalid" if form.due_date.errors else ""),
+      id="input-due-date"
+    )
+  }}
+  {% for error in form.due_date.errors %}
+    <div class="invalid-feedback">{{ error }}</div>
+  {% endfor %}
+  <div class="form-text">Optional. Leave blank for no deadline.</div>
+</div>

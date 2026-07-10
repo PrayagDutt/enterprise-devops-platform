@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Create Account — DevOps Task Manager{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+
+  <!-- Animated background blobs -->
+  <div class="auth-blob auth-blob-1"></div>
+  <div class="auth-blob auth-blob-2"></div>
+
+  <div class="auth-card">
+
+    <!-- Heading -->
+    <div class="auth-header">
+      <div class="auth-logo">
+        <i class="bi bi-person-plus-fill"></i>
+      </div>
+      <h1 class="auth-title">Create account</h1>
+      <p class="auth-subtitle">Join DevOps Task Manager and start tracking your work</p>
+    </div>
+
+    <!-- Registration Form -->
+    <form
+      method="POST"
+      action="{{ url_for('auth.register') }}"
+      novalidate
+      id="register-form"
+    >
+      {{ form.hidden_tag() }}  {# CSRF token #}
+
+      <!-- Username -->
+      <div class="mb-3">
+        {{ form.username.label(class="form-label fw-medium") }}
+        {{ form.username(
+            class="form-control" + (" is-invalid" if form.username.errors else ""),
+            id="input-username"
+          )
+        }}
+        {% for error in form.username.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+        <div class="form-text">3–80 characters, letters, numbers, and underscores only.</div>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        {{ form.email.label(class="form-label fw-medium") }}
+        {{ form.email(
+            class="form-control" + (" is-invalid" if form.email.errors else ""),
+            id="input-email"
+          )
+        }}
+        {% for error in form.email.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        {{ form.password.label(class="form-label fw-medium") }}
+        <div class="input-group">
+          {{ form.password(
+              class="form-control" + (" is-invalid" if form.password.errors else ""),
+              id="input-password"
+            )
+          }}
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            id="btn-toggle-password"
+            onclick="togglePasswordVisibility('input-password', 'icon-pw-toggle')"
+            aria-label="Toggle password visibility"
+          >
+            <i class="bi bi-eye" id="icon-pw-toggle"></i>
+          </button>
+          {% for error in form.password.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- Password strength meter -->
+        <div class="mt-2">
+          <div class="progress" style="height: 4px;">
+            <div
+              class="progress-bar"
+              id="pw-strength-bar"
+              role="progressbar"
+              style="width: 0%"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+          <small class="text-muted" id="pw-strength-label">Enter a password</small>
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="mb-4">
+        {{ form.confirm_password.label(class="form-label fw-medium") }}
+        {{ form.confirm_password(
+            class="form-control" + (" is-invalid" if form.confirm_password.errors else ""),
+            id="input-confirm-password"
+          )
+        }}
+        {% for error in form.confirm_password.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Submit -->
+      {{ form.submit(class="btn btn-primary btn-lg w-100 auth-submit-btn", id="btn-register") }}
+
+    </form>
+
+    <!-- Login link -->
+    <div class="auth-footer">
+      <p class="mb-0 text-muted">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}" id="link-login" class="auth-link">
+          Sign in here
+        </a>
+      </p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Password strength meter — updates as user types
+  const pwInput = document.getElementById('input-password');
+  const pwBar   = document.getElementById('pw-strength-bar');
+  const pwLabel = document.getElementById('pw-strength-label');
+
+  if (pwInput) {
+    pwInput.addEventListener('input', () => {
+      const val = pwInput.value;
+      let score = 0;
+      if (val.length >= 8)  score += 25;
+      if (val.length >= 12) score += 15;
+      if (/[A-Z]/.test(val)) score += 20;
+      if (/[0-9]/.test(val)) score += 20;
+      if (/[^A-Za-z0-9]/.test(val)) score += 20;
+
+      pwBar.style.width = score + '%';
+      pwBar.setAttribute('aria-valuenow', score);
+
+      if (score < 30)      { pwBar.className = 'progress-bar bg-danger';  pwLabel.textContent = 'Weak'; }
+      else if (score < 60) { pwBar.className = 'progress-bar bg-warning'; pwLabel.textContent = 'Fair'; }
+      else if (score < 80) { pwBar.className = 'progress-bar bg-info';    pwLabel.textContent = 'Good'; }
+      else                 { pwBar.className = 'progress-bar bg-success';  pwLabel.textContent = 'Strong'; }
+    });
+  }
+</script>
+{% endblock %}

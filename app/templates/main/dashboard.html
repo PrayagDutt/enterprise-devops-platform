@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — DevOps Task Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle text-muted">
+      Welcome back, <strong>{{ current_user.username }}</strong>! Here's your task summary.
+    </p>
+  </div>
+  <a href="{{ url_for('tasks.create') }}" id="btn-new-task-dashboard" class="btn btn-primary btn-glow">
+    <i class="bi bi-plus-lg me-2"></i>New Task
+  </a>
+</div>
+
+<!-- ── Summary Cards ────────────────────────────────────────────────────── -->
+<div class="row g-4 mb-4">
+
+  <!-- Total -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card stat-card-total" id="card-total">
+      <div class="stat-icon"><i class="bi bi-stack"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total }}</div>
+        <div class="stat-label">Total Tasks</div>
+      </div>
+      <div class="stat-sparkline">
+        <div class="sparkline-bar" style="height: 100%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- To Do -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card stat-card-todo" id="card-todo">
+      <div class="stat-icon"><i class="bi bi-circle"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ todo_count }}</div>
+        <div class="stat-label">To Do</div>
+      </div>
+      <div class="stat-progress">
+        <div class="progress" style="height:4px;">
+          <div
+            class="progress-bar bg-secondary"
+            style="width: {{ (todo_count / total * 100) | round | int if total > 0 else 0 }}%"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- In Progress -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card stat-card-inprogress" id="card-inprogress">
+      <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ in_progress_count }}</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-progress">
+        <div class="progress" style="height:4px;">
+          <div
+            class="progress-bar bg-warning"
+            style="width: {{ (in_progress_count / total * 100) | round | int if total > 0 else 0 }}%"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card stat-card-done" id="card-done">
+      <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ done_count }}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-progress">
+        <div class="progress" style="height:4px;">
+          <div
+            class="progress-bar bg-success"
+            style="width: {{ (done_count / total * 100) | round | int if total > 0 else 0 }}%"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Overdue Alert ─────────────────────────────────────────────────────── -->
+{% if overdue_tasks %}
+<div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4" role="alert" id="overdue-alert">
+  <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3 fs-5"></i>
+  <div>
+    <strong>{{ overdue_tasks | length }} overdue task{{ 's' if overdue_tasks | length > 1 else '' }}!</strong>
+    {% for t in overdue_tasks[:3] %}
+      <a href="{{ url_for('tasks.edit', task_id=t.id) }}" class="badge bg-danger text-decoration-none ms-1">{{ t.title | truncate(30) }}</a>
+    {% endfor %}
+    {% if overdue_tasks | length > 3 %}
+      <a href="{{ url_for('tasks.index', status='todo') }}" class="ms-1 text-white">+{{ overdue_tasks | length - 3 }} more</a>
+    {% endif %}
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<!-- ── Bottom Panels ──────────────────────────────────────────────────────── -->
+<div class="row g-4">
+
+  <!-- Recent Activity -->
+  <div class="col-lg-7">
+    <div class="panel" id="panel-recent-tasks">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="bi bi-clock-history me-2"></i>Recent Activity</h2>
+        <a href="{{ url_for('tasks.index') }}" class="btn btn-sm btn-outline-secondary" id="btn-view-all">
+          View all <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+      <div class="panel-body">
+        {% if recent_tasks %}
+          <ul class="activity-list">
+            {% for task in recent_tasks %}
+            <li class="activity-item" id="recent-task-{{ task.id }}">
+              <div class="activity-icon">
+                {% if task.status.value == 'done' %}
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                {% elif task.status.value == 'in_progress' %}
+                  <i class="bi bi-hourglass-split text-warning"></i>
+                {% else %}
+                  <i class="bi bi-circle text-secondary"></i>
+                {% endif %}
+              </div>
+              <div class="activity-content">
+                <div class="activity-title">
+                  <a href="{{ url_for('tasks.edit', task_id=task.id) }}" class="activity-link">
+                    {{ task.title | truncate(60) }}
+                  </a>
+                </div>
+                <div class="activity-meta">
+                  <span class="badge badge-priority badge-priority-{{ task.priority.value }}">
+                    {{ task.priority_label }}
+                  </span>
+                  {% if task.due_date %}
+                    <span class="text-muted small ms-2">
+                      <i class="bi bi-calendar3 me-1"></i>{{ task.due_date.strftime('%b %d, %Y') }}
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="activity-time text-muted small">
+                {{ task.updated_at.strftime('%b %d') }}
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state" id="empty-recent">
+            <i class="bi bi-inbox empty-state-icon"></i>
+            <p class="empty-state-text">No tasks yet.</p>
+            <a href="{{ url_for('tasks.create') }}" class="btn btn-primary btn-sm" id="btn-create-first">
+              Create your first task
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Completion Progress -->
+  <div class="col-lg-5">
+    <div class="panel" id="panel-progress">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="bi bi-bar-chart-fill me-2"></i>Completion</h2>
+      </div>
+      <div class="panel-body">
+        {% if total > 0 %}
+          <!-- Donut-style progress visual -->
+          <div class="completion-ring-wrapper">
+            <div class="completion-ring" id="completion-ring" data-value="{{ (done_count / total * 100) | round | int }}">
+              <svg viewBox="0 0 120 120" class="ring-svg">
+                <circle class="ring-track" cx="60" cy="60" r="50" />
+                <circle
+                  class="ring-progress"
+                  cx="60" cy="60" r="50"
+                  stroke-dasharray="314"
+                  stroke-dashoffset="{{ 314 - (314 * done_count / total) | round | int }}"
+                />
+              </svg>
+              <div class="ring-label">
+                <span class="ring-value">{{ (done_count / total * 100) | round | int }}%</span>
+                <span class="ring-sub">Complete</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status breakdown bars -->
+          <div class="breakdown-list mt-3">
+            <div class="breakdown-item">
+              <span class="breakdown-dot bg-secondary"></span>
+              <span class="breakdown-name">To Do</span>
+              <span class="breakdown-count ms-auto">{{ todo_count }}</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-dot bg-warning"></span>
+              <span class="breakdown-name">In Progress</span>
+              <span class="breakdown-count ms-auto">{{ in_progress_count }}</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-dot bg-success"></span>
+              <span class="breakdown-name">Done</span>
+              <span class="breakdown-count ms-auto">{{ done_count }}</span>
+            </div>
+          </div>
+
+        {% else %}
+          <div class="empty-state" id="empty-progress">
+            <i class="bi bi-bar-chart empty-state-icon"></i>
+            <p class="empty-state-text">Stats will appear once you create tasks.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
