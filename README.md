@@ -34,49 +34,54 @@ The project follows enterprise DevOps practices including Infrastructure as Code
 
 ```mermaid
 flowchart TB
-    subgraph Dev["👨💻 Development"]
-        Developer["Developer"]
+    subgraph Dev["Development"]
+        Developer["👨‍💻 Developer"]
     end
-    subgraph CI["🔄 CI/CD Pipeline"]
+    
+    subgraph CI["CI/CD Pipeline"]
         GitHub["📦 GitHub Repository"]
         Jenkins["⚙️ Jenkins CI/CD"]
         DockerBuild["🐳 Build Docker Image"]
         DockerPush["📤 Push to Docker Hub"]
     end
-    subgraph K8s["☸ Kubernetes Cluster (AWS EC2)"]
+    
+    subgraph K8s["Kubernetes Cluster (AWS EC2)"]
         subgraph Control["Control Plane"]
             API["API Server"]
             Scheduler["Scheduler"]
         end
         
         subgraph Workers["Worker Nodes"]
-            Pod1["Pod 1<br/>(App Instance)"]
-            Pod2["Pod 2<br/>(App Instance)"]
-            Pod3["Pod 3<br/>(App Instance)"]
+            Pod1["Pod 1 (App Instance)"]
+            Pod2["Pod 2 (App Instance)"]
+            Pod3["Pod 3 (App Instance)"]
         end
         
         Service["🔄 Kubernetes Service"]
     end
-    subgraph AWS["☁️ AWS Cloud"]
-        ALB["⚖️ Application<br/>Load Balancer"]
+    
+    subgraph AWS["AWS Cloud"]
+        ALB["⚖️ App Load Balancer"]
         
-        subgraph Database["🗄️ Database"]
-            RDS["Amazon RDS MySQL"]
+        subgraph Database["Database"]
+            RDS["🗄️ Amazon RDS MySQL"]
         end
         
-        subgraph Storage["📁 Storage"]
-            S3["Amazon S3"]
+        subgraph Storage["Storage"]
+            S3["📁 Amazon S3"]
         end
         
-        subgraph IaC["🏗️ Infrastructure"]
-            Terraform["Terraform"]
+        subgraph IaC["Infrastructure"]
+            Terraform["🏗️ Terraform"]
             Ansible["Ansible"]
         end
     end
-    subgraph Monitoring["📊 Monitoring"]
+    
+    subgraph Monitoring["Monitoring"]
         Prometheus["📈 Prometheus"]
         Grafana["📉 Grafana"]
     end
+
     Developer -->|Git Push| GitHub
     GitHub -->|Webhook Trigger| Jenkins
     Jenkins -->|Checkout Code| GitHub
@@ -96,6 +101,7 @@ flowchart TB
     
     K8s -->|Scrape Metrics| Prometheus
     Prometheus -->|Visualize| Grafana
+
     style Dev fill:#e3f2fd,stroke:#1565c0
     style CI fill:#f3e5f5,stroke:#6a1b9a
     style K8s fill:#e8f5e9,stroke:#2e7d32
@@ -106,9 +112,12 @@ flowchart TB
     style Storage fill:#e0f7fa,stroke:#00695c
     style IaC fill:#f3e5f5,stroke:#7b1fa2
     style Monitoring fill:#e0f7fa,stroke:#00695c
+
 ```
 🔄 CI/CD Pipeline Workflow
+
 ### 🔄 CI/CD Pipeline Workflow
+
 ```mermaid
 flowchart LR
     A[Developer] -->|Git Push| B[GitHub]
