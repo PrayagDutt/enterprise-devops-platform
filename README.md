@@ -20,35 +20,38 @@ The platform is deployed across two AWS regions connected through VPC Peering, p
 ```mermaid
 flowchart LR
 
-A[Developer] -->|Git Push| B[GitHub Repository]
-B -->|Webhook| C[Jenkins CI/CD]
-C -->|Build Docker Image| D[Docker]
-D -->|Push Image| E[Docker Hub]
-C -->|Deploy Latest Image| F[Docker Container on EC2]
+A(["👨‍💻 Developer"]) -->|Git Push| B["🐙 GitHub Repository"]
+B -->|Webhook| C["⚙️ Jenkins CI/CD"]
+C -->|Build Image| D["🐳 Docker Build"]
+D -->|Push Image| E["📦 Docker Hub"]
+C -->|Deploy Latest| F["🐳 Docker Container on EC2"]
 
-subgraph AWS Cloud
-    G[Application EC2]
-    H[(Amazon RDS MySQL)]
-    I[S3 Bucket]
-    J[VPC]
-    K[Public Subnet]
-    L[Private Subnet]
-    M[Security Groups]
-
-    G --> H
-    G --> I
+subgraph AWS["☁️ AWS Cloud"]
+    direction LR
+    subgraph VPC["🔒 VPC"]
+        direction LR
+        subgraph Public["🌐 Public Subnet"]
+            G["🖥️ Application EC2"]
+        end
+        subgraph Private["🔐 Private Subnet"]
+            H[("🗄️ Amazon RDS - MySQL")]
+        end
+        M{{"🛡️ Security Groups"}}
+    end
+    I["🪣 S3 Bucket"]
 end
 
 F --> G
-User[Browser] -->|HTTP :5000| G
-J --> K
-J --> L
-K --> G
-L --> H
-M --> G
-M --> H
-```
+G --> H
+G --> I
+M -.-> G
+M -.-> H
+User(["🌍 Browser User"]) -->|HTTP :5000| G
 
-Monitoring and observability are implemented using Prometheus, Grafana, and Amazon CloudWatch, offering real-time dashboards, application metrics, infrastructure monitoring, and centralized logging.
+classDef dev fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#01579b
+classDef ci fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100
+classDef docker fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20
+classDef aws fill:#ede7f6,stroke:#5e35b1,stroke-width:2px,color:#311b92
+classDef compute fill:#fce4ec,stroke:#c2185b,stroke-width
 
-The project demonstrates modern DevOps practices including Infrastructure as Code, Continuous Integration, Continuous Deployment, Containerization, Configuration Management, Monitoring, Multi-Region Architecture, and High Availability.
+
