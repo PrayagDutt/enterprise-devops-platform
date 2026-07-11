@@ -96,7 +96,7 @@ flowchart TB
     DockerBuild -->|Push| DockerPush
     DockerPush -->|Deploy| K8s
     
-    K8s -->|Expose| Service
+    Workers -->|Expose| Service
     Service -->|Route Traffic| ALB
     ALB -->|User Access| Developer
     
@@ -149,6 +149,7 @@ flowchart LR
     style I fill:#e8f5e9,stroke:#2e7d32
     style J fill:#e3f2fd,stroke:#1565c0
     style K fill:#c8e6c9,stroke:#388e3c
+
 ```
 
 ## ☁ AWS Architecture
