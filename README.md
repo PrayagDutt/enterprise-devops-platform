@@ -1,6 +1,6 @@
-                                      # Enterprise DevOps Task Management Platform
+# Enterprise DevOps Task Management Platform
 
-                                               ## Project Overview
+## Project Overview
 
 The **Enterprise DevOps Task Management Platform** is a cloud-native, production-ready web application built to demonstrate a complete DevOps lifecycle using modern tools and AWS cloud services. The project automates application deployment, infrastructure provisioning, monitoring, and scaling through an end-to-end CI/CD pipeline.
 
@@ -110,6 +110,31 @@ class User user
 
 ---
 
+## Docker
+
+### Build the image
+
+```bash
+docker build -t prayag1/enterprise-devops-platform:tagname .
+```
+
+### Push to Docker Hub
+
+```bash
+docker login
+docker push prayag1/enterprise-devops-platform:tagname
+```
+
+### Run the container locally
+
+```bash
+docker run -d -p 5000:5000 --name devops-platform prayag1/enterprise-devops-platform:tagname
+```
+
+> Replace `tagname` with a version tag (e.g. `v1.0`, `latest`) each time you build and push a new image. Jenkins uses this same image in the CI/CD pipeline to deploy the latest build to EC2 / Kubernetes.
+
+---
+
 ## Repository Structure
 
 ```
@@ -120,5 +145,6 @@ class User user
 ├── k8s/                 # Kubernetes manifests (Deployment, Service, HPA)
 ├── Jenkinsfile          # CI/CD pipeline definition
 ├── Dockerfile           # Container build definition
+├── requirements.txt     # Python dependencies
 └── README.md
 ```
