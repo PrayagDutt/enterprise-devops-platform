@@ -119,6 +119,9 @@ flowchart TB
     style Storage fill:#e0f7fa,stroke:#00695c
     style IaC fill:#f3e5f5,stroke:#7b1fa2
     style Monitoring fill:#e0f7fa,stroke:#00695c
+    
+    %% Make arrows and text thick and dark
+    linkStyle default stroke:#000000,stroke-width:2px,color:#000000;
 
 ```
 🔄 CI/CD Pipeline Workflow
