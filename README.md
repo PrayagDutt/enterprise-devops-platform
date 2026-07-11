@@ -41,10 +41,13 @@ The project follows enterprise DevOps practices including Infrastructure as Code
 
 ```mermaid
 flowchart TB
-    subgraph Dev["Development"]
-        Developer["👨‍💻 Developer"]
-    end
+    %% TOP - Developer (Code Provider)
+    Developer["👨‍💻 Developer"]
     
+    %% USERS Column (Bottom)
+    Users["👥 End Users"]
+    
+    %% CI/CD Pipeline
     subgraph CI["CI/CD Pipeline"]
         GitHub["📦 GitHub Repository"]
         Jenkins["⚙️ Jenkins CI/CD"]
@@ -52,77 +55,86 @@ flowchart TB
         DockerPush["📤 Push to Docker Hub"]
     end
     
+    %% Kubernetes on EC2
     subgraph K8s["Kubernetes Cluster (AWS EC2)"]
+        subgraph Workers["Worker Nodes (EC2 Instances)"]
+            Pod1["📦 Pod 1"]
+            Pod2["📦 Pod 2"]
+            Pod3["📦 Pod 3"]
+        end
         subgraph Control["Control Plane"]
-            API["API Server"]
-            Scheduler["Scheduler"]
+            API["⚙️ API Server"]
+            Scheduler["📅 Scheduler"]
         end
-        
-        subgraph Workers["Worker Nodes"]
-            Pod1["Pod 1 (App Instance)"]
-            Pod2["Pod 2 (App Instance)"]
-            Pod3["Pod 3 (App Instance)"]
-        end
-        
         Service["🔄 Kubernetes Service"]
     end
     
+    %% AWS Cloud
     subgraph AWS["AWS Cloud"]
-        ALB["⚖️ App Load Balancer"]
-        
+        ALB["⚖️ Application Load Balancer"]
         subgraph Database["Database"]
             RDS["🗄️ Amazon RDS MySQL"]
         end
-        
         subgraph Storage["Storage"]
             S3["📁 Amazon S3"]
         end
-        
         subgraph IaC["Infrastructure"]
             Terraform["🏗️ Terraform"]
-            Ansible["Ansible"]
+            Ansible["⚙️ Ansible"]
         end
     end
     
+    %% Monitoring
     subgraph Monitoring["Monitoring"]
         Prometheus["📈 Prometheus"]
         Grafana["📉 Grafana"]
     end
 
-    Developer -->|Git Push| GitHub
-    GitHub -->|Webhook Trigger| Jenkins
-    Jenkins -->|Checkout Code| GitHub
-    Jenkins -->|Build| DockerBuild
-    DockerBuild -->|Push| DockerPush
-    DockerPush -->|Deploy| K8s
+    %% MAIN FLOW - Developer to Deployment
+    Developer -->|"1. Writes & Pushes Code"| GitHub
+    GitHub -->|"2. Webhook Trigger"| Jenkins
+    Jenkins -->|"3. Checkout Code"| GitHub
+    Jenkins -->|"4. Build Docker Image"| DockerBuild
+    DockerBuild -->|"5. Push to Registry"| DockerPush
+    DockerPush -->|"6. Deploy to K8s"| K8s
     
-    Workers -->|Expose| Service
-    Service -->|Route Traffic| ALB
-    ALB -->|User Access| Developer
+    %% Kubernetes Internal Flow
+    K8s -->|"7. Schedule Pods on EC2"| Workers
+    Workers -->|"8. Expose Application"| Service
+    Service -->|"9. Route Traffic"| ALB
+    ALB -->|"10. User Access via Browser"| Users
     
-    K8s -->|Store Data| RDS
-    K8s -->|Store Files| S3
+    %% Data & Infrastructure
+    K8s -->|"11. Store Persistent Data"| RDS
+    K8s -->|"12. Store Static Files"| S3
+    K8s -->|"13. Provision Infrastructure"| Terraform
+    Terraform -->|"14. Provision AWS Resources"| AWS
+    K8s -->|"15. Configure Cluster"| Ansible
+    Ansible -->|"16. Apply Configuration"| K8s
     
-    Terraform -->|Provision| AWS
-    Ansible -->|Configure| K8s
-    
-    K8s -->|Scrape Metrics| Prometheus
-    Prometheus -->|Visualize| Grafana
+    %% Monitoring
+    K8s -->|"17. Scrape Metrics"| Prometheus
+    Prometheus -->|"18. Visualize Dashboards"| Grafana
 
-    style Dev fill:#e3f2fd,stroke:#1565c0
-    style CI fill:#f3e5f5,stroke:#6a1b9a
-    style K8s fill:#e8f5e9,stroke:#2e7d32
-    style Control fill:#fff3e0,stroke:#e65100
-    style Workers fill:#fce4ec,stroke:#c62828
-    style AWS fill:#e8f5e9,stroke:#2e7d32
-    style Database fill:#fff8e1,stroke:#f57f17
-    style Storage fill:#e0f7fa,stroke:#00695c
-    style IaC fill:#f3e5f5,stroke:#7b1fa2
-    style Monitoring fill:#e0f7fa,stroke:#00695c
+    %% Developer Style - RED
+    style Developer fill:#ff4444,stroke:#cc0000,stroke-width:4px,color:#ffffff,font-size:18px,font-weight:bold
     
-    %% Make arrows and text thick and dark
-    linkStyle default stroke:#000000,stroke-width:2px,color:#000000;
+    %% Users Style - BLUE
+    style Users fill:#4A90D9,stroke:#2C5F8A,stroke-width:4px,color:#ffffff,font-size:18px,font-weight:bold
+    
+    %% Subgraph Styles
+    style CI fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    style K8s fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style Control fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style Workers fill:#fce4ec,stroke:#c62828,stroke-width:2px
+    style AWS fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style Monitoring fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    style IaC fill:#e8eaf6,stroke:#283593,stroke-width:2px
+    style Database fill:#e0f7fa,stroke:#00695c,stroke-width:2px
+    style Storage fill:#fff8e1,stroke:#f57f17,stroke-width:2px
 
+    %% Pure Black Arrows
+    linkStyle default stroke:#000000,stroke-width:3px,color:#000000
 ```
 🔄 CI/CD Pipeline Workflow
 
@@ -141,18 +153,7 @@ flowchart LR
     I --> J[Kubernetes Cluster]
     J --> K[Application Live]
     
-    style A fill:#e3f2fd,stroke:#1565c0
-    style B fill:#f3e5f5,stroke:#6a1b9a
-    style C fill:#e8f5e9,stroke:#2e7d32
-    style D fill:#fff3e0,stroke:#e65100
-    style E fill:#fce4ec,stroke:#c62828
-    style F fill:#fff8e1,stroke:#f57f17
-    style G fill:#e0f7fa,stroke:#00695c
-    style H fill:#f3e5f5,stroke:#7b1fa2
-    style I fill:#e8f5e9,stroke:#2e7d32
-    style J fill:#e3f2fd,stroke:#1565c0
-    style K fill:#c8e6c9,stroke:#388e3c
-
+    classDef default fill:#0ea5e9,stroke:#0284c7,stroke-width:2px,color:#ffffff;
 ```
 
 ## ☁ AWS Architecture
