@@ -1,165 +1,347 @@
-# 🚀 Enterprise Task Management Platform CI/CD Automated 
-### Zero-Touch CI/CD | Multi-Region High Availability | Infrastructure as Code on AWS
+# 🚀 Enterprise DevOps Task Management Platform
 
-> Architected and deployed a production-grade, multi-region AWS platform with fully automated CI/CD (Jenkins, Docker), Infrastructure as Code (Terraform, Ansible), and Kubernetes-orchestrated container deployment — taking every release from `git push` to production with zero manual intervention.
+### End-to-End CI/CD Pipeline | AWS | Terraform | Docker | Jenkins | Kubernetes | Ansible | Grafana
 
-## Project Overview
-
-The **Enterprise DevOps Task Management Platform** is a cloud-native, production-ready web application built to demonstrate a complete DevOps lifecycle using modern tools and AWS cloud services. The project automates application deployment, infrastructure provisioning, monitoring, and scaling through an end-to-end CI/CD pipeline.
-
-The application is built using **Python Flask** with a **MySQL** database (**Amazon RDS** in production) and is fully containerized using **Docker**. Source code is maintained in **GitHub**, while **Jenkins** automates the build, test, Docker image creation, and deployment process. Docker images are stored in **Docker Hub**.
-
-Infrastructure is provisioned using **Terraform**, enabling Infrastructure as Code (IaC) for AWS resources including VPCs, subnets, EC2 instances, Amazon RDS, Application Load Balancers, IAM roles, and Amazon S3.
-
-Application configuration and software installation are automated using **Ansible**, while **Kubernetes** manages container orchestration, rolling deployments, auto-healing, and horizontal pod autoscaling.
-
-The platform is deployed across **two AWS regions** connected through **VPC Peering**, providing high availability and disaster recovery capabilities.
+> A production-style cloud-native DevOps project demonstrating Infrastructure as Code (IaC), Continuous Integration & Continuous Deployment (CI/CD), containerization, Kubernetes orchestration, and AWS cloud deployment.
 
 ---
 
-## Architecture Diagram
+# 📖 Project Overview
 
-```mermaid
-flowchart LR
+The **Enterprise DevOps Task Management Platform** demonstrates a complete DevOps lifecycle from infrastructure provisioning to application deployment using modern DevOps tools and AWS cloud services.
 
-A(["👨‍💻 Developer"]) -->|Git Push| B["🐙 GitHub Repo"]
-B -->|Webhook| C["⚙️ Jenkins CI/CD"]
-C -->|Build + Push| D["🐳 Docker Hub"]
-C -->|terraform apply| E["🏗️ Terraform"]
-E -->|Provisioned EC2 Hosts| F["🔴 Ansible"]
+The application is built using **Python Flask** with **Amazon RDS MySQL** as the backend database. Infrastructure is provisioned using **Terraform**, containerized using **Docker**, and deployed automatically through **Jenkins CI/CD**. Kubernetes deployment manifests are included to demonstrate container orchestration and production deployment readiness.
 
-subgraph R1["☁️ AWS Region 1 (Primary)"]
-    direction LR
-    subgraph VPC1["🔒 VPC"]
-        direction LR
-        K8s{{"☸️ Kubernetes Cluster"}}
-        subgraph AZ1["Availability Zone 1"]
-            G1["🖥️ App EC2 / K8s Node"]
-        end
-        subgraph AZ2["Availability Zone 2"]
-            G2["🖥️ App EC2 / K8s Node"]
-        end
-        H1[("🗄️ RDS MySQL")]
-    end
-    S1["🪣 S3 Bucket"]
-end
+The project follows enterprise DevOps practices including Infrastructure as Code, automated deployments, containerization, and cloud-native architecture.
 
-subgraph R2["☁️ AWS Region 2 (DR / Standby)"]
-    direction LR
-    subgraph VPC2["🔒 VPC"]
-        G3["🖥️ Standby EC2 / K8s Node"]
-        H2[("🗄️ RDS Read Replica")]
-    end
-    S2["🪣 S3 (Replicated)"]
-end
+---
 
-D -->|Docker Pull Latest Image| K8s
-F -->|Configures EC2 & K8s Hosts| VPC1
-K8s --> G1
-K8s --> G2
-G1 --> H1
-G2 --> H1
-G1 --> S1
+# 🏗 Architecture Diagram
 
-VPC1 <-.->|VPC Peering| VPC2
-H1 -.->|Replication| H2
-
-User(["🌍 Browser User"]) -->|HTTPS| G1
-
-classDef ci fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100
-classDef iac fill:#f3e7fb,stroke:#7b42bc,stroke-width:2px,color:#4a148c
-classDef k8s fill:#e8eaf6,stroke:#326ce5,stroke-width:2px,color:#1a237e
-classDef storage fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,color:#f57f17
-classDef dr fill:#eceff1,stroke:#546e7a,stroke-width:2px,color:#37474f
-
-class B,C,D ci
-class E,F iac
-class K8s,G1,G2 k8s
-class H1,S1 storage
-class R2,VPC2,G3,H2,S2 dr
+```text
+                                     ┌────────────────────┐
+                                     │     Developer      │
+                                     └─────────┬──────────┘
+                                               │
+                                         Git Push
+                                               │
+                                               ▼
+                                 ┌────────────────────────┐
+                                 │        GitHub          │
+                                 │ Source Code Repository │
+                                 └─────────┬──────────────┘
+                                           │ Webhook
+                                           ▼
+                              ┌────────────────────────────┐
+                              │        Jenkins CI/CD       │
+                              │                            │
+                              │ • Checkout Code           │
+                              │ • Build Docker Image      │
+                              │ • Push Docker Hub         │
+                              │ • Deploy Application      │
+                              └─────────┬──────────────────┘
+                                        │
+                                        ▼
+                           ┌──────────────────────────┐
+                           │       Docker Hub         │
+                           │ Container Registry       │
+                           └─────────┬────────────────┘
+                                     │
+                                     ▼
+                      ┌──────────────────────────────────┐
+                      │         AWS Infrastructure        │
+                      │                                  │
+                      │  VPC                             │
+                      │  ├── Public Subnet              │
+                      │  │      └── EC2 Application     │
+                      │  │             │                │
+                      │  │             ▼                │
+                      │  │      Docker Container        │
+                      │  │             │                │
+                      │  ├── Private Subnet             │
+                      │  │      └── Amazon RDS MySQL    │
+                      │  │                             │
+                      │  └── Amazon S3                 │
+                      └──────────────────────────────────┘
+                                     │
+                                     ▼
+                           End Users Access Application
 ```
 
 ---
 
-## Technology Stack
+# ☁ AWS Architecture
 
-| Category | Tools |
-|---|---|
-| **Application** | Python, Flask |
-| **Database** | MySQL, Amazon RDS |
-| **Containerization** | Docker |
-| **Orchestration** | Kubernetes (Deployments, Services, HPA) |
-| **CI/CD** | Jenkins |
-| **Infrastructure as Code** | Terraform |
-| **Configuration Management** | Ansible |
-| **Cloud Provider** | AWS (EC2, RDS, S3, VPC, ALB, IAM) |
-| **Networking** | VPC Peering (multi-region), Public/Private Subnets |
-| **Version Control** | Git, GitHub |
+The complete AWS infrastructure is provisioned using **Terraform**.
 
----
+### Resources Created
 
-## Key Features
-
-- ✅ **Infrastructure as Code** — full AWS environment provisioned via Terraform
-- ✅ **CI/CD Pipeline** — automated build, test, and deploy with Jenkins
-- ✅ **Containerization** — Dockerized Flask application, images pushed to Docker Hub
-- ✅ **Configuration Management** — automated server setup and app config via Ansible
-- ✅ **Container Orchestration** — Kubernetes-managed deployments with rolling updates, auto-healing, and horizontal pod autoscaling
-- ✅ **High Availability** — multi-region AWS deployment connected via VPC Peering
-- ✅ **Secure Networking** — public/private subnet separation with dedicated security groups
-- ✅ **Managed Database** — Amazon RDS (MySQL) in a private subnet
-- ✅ **Static Asset Storage** — Amazon S3
+- Amazon VPC
+- Public Subnets
+- Private Subnets
+- Internet Gateway
+- NAT Gateway
+- Route Tables
+- Security Groups
+- EC2 Instances
+- Amazon RDS MySQL
+- Amazon S3
+- Application Load Balancer Components
+- IAM Roles
 
 ---
 
-## How It Works
+# ⚙ Technology Stack
 
-1. A developer pushes code to the **GitHub** repository.
-2. A **webhook** triggers the **Jenkins** pipeline.
-3. Jenkins checks out the code, runs tests, and builds a **Docker image**.
-4. The image is pushed to **Docker Hub**.
-5. Jenkins deploys the latest image to the **Application EC2 instance** inside AWS.
-6. The Flask app connects to **Amazon RDS** for data and **Amazon S3** for static assets.
-7. **Security Groups** control traffic between the application, database, and internet.
-8. End users access the app over HTTP through the public subnet.
+| Category | Technologies |
+|----------|--------------|
+| Programming | Python, Flask |
+| Database | MySQL, Amazon RDS |
+| Cloud Platform | AWS EC2, RDS, VPC, IAM, S3 |
+| Infrastructure as Code | Terraform |
+| Configuration Management | Ansible |
+| CI/CD | Jenkins |
+| Containerization | Docker |
+| Container Orchestration | Kubernetes |
+| Monitoring | Grafana, Prometheus |
+| Version Control | Git, GitHub |
+| Operating System | Ubuntu Linux |
 
 ---
 
-## Docker
+# 📂 Repository Structure
 
-### Build the image
+```
+enterprise-devops-platform
+│
+├── Src/
+│   ├── app/
+│   ├── migrations/
+│   ├── requirements.txt
+│   └── run.py
+│
+├── terraform/
+│   ├── vpc.tf
+│   ├── subnet.tf
+│   ├── internet-gateway.tf
+│   ├── nat-gateway.tf
+│   ├── route-table.tf
+│   ├── security-group.tf
+│   ├── ec2.tf
+│   ├── alb.tf
+│   ├── target-group.tf
+│   ├── rds.tf
+│   ├── s3.tf
+│   ├── variables.tf
+│   ├── versions.tf
+│   └── userdata.sh
+│
+├── k8s/
+│   ├── deployment.yaml
+│   └── service.yaml
+│
+├── Dockerfile
+├── Jenkinsfile
+├── README.md
+└── .gitignore
+```
+
+---
+
+# 🔄 CI/CD Pipeline Workflow
+
+The CI/CD pipeline automates the complete application deployment.
+
+### Pipeline Flow
+
+1. Developer pushes code to GitHub.
+2. Jenkins automatically triggers the pipeline.
+3. Jenkins checks out the latest source code.
+4. Docker image is built.
+5. Image is pushed to Docker Hub.
+6. Latest container is deployed on the application server.
+7. Flask application connects to Amazon RDS.
+8. Users access the application.
+
+---
+
+# 🐳 Docker
+
+## Build Image
 
 ```bash
-docker build -t prayag1/enterprise-devops-platform:tagname .
+docker build -t prayag1/enterprise-devops-platform:latest .
 ```
 
-### Push to Docker Hub
+## Login
 
 ```bash
 docker login
-docker push prayag1/enterprise-devops-platform:tagname
 ```
 
-### Run the container locally
+## Push Image
 
 ```bash
-docker run -d -p 5000:5000 --name devops-platform prayag1/enterprise-devops-platform:tagname
+docker push prayag1/enterprise-devops-platform:latest
 ```
 
-> Replace `tagname` with a version tag (e.g. `v1.0`, `latest`) each time you build and push a new image. Jenkins uses this same image in the CI/CD pipeline to deploy the latest build to EC2 / Kubernetes.
+## Run Container
+
+```bash
+docker run -d \
+-p 5000:5000 \
+--name devops-platform \
+prayag1/enterprise-devops-platform:latest
+```
 
 ---
 
-## Repository Structure
+# ☸ Kubernetes
 
-```
-.
-├── app/                # Flask application source code
-├── terraform/          # Infrastructure as Code (AWS resources)
-├── ansible/             # Configuration management playbooks
-├── k8s/                 # Kubernetes manifests (Deployment, Service, HPA)
-├── Jenkinsfile          # CI/CD pipeline definition
-├── Dockerfile           # Container build definition
-├── requirements.txt     # Python dependencies
-└── README.md
-```
+The project includes Kubernetes manifests for deployment.
+
+Current resources:
+
+- Deployment
+- Service
+
+Deployment supports:
+
+- Multiple Replicas
+- Rolling Updates
+- Self-Healing Pods
+- High Availability
+
+---
+
+# 🏗 Infrastructure as Code
+
+Infrastructure provisioning is fully automated using **Terraform**.
+
+Terraform provisions:
+
+- VPC
+- Networking
+- EC2
+- Security Groups
+- RDS
+- S3
+- IAM
+- Load Balancer Components
+
+Benefits:
+
+- Repeatable deployments
+- Version-controlled infrastructure
+- Easy scalability
+- Automated provisioning
+
+---
+
+# ⚙ Configuration Management
+
+The project is designed to support **Ansible** for server configuration automation.
+
+Typical automation tasks include:
+
+- Package Installation
+- Docker Installation
+- Python Installation
+- Jenkins Configuration
+- Environment Configuration
+- Application Deployment
+
+---
+
+# 📊 Monitoring
+
+The platform is designed for integration with modern monitoring tools.
+
+Monitoring Stack
+
+- Grafana Dashboards
+- Prometheus Metrics
+- EC2 Monitoring
+- Docker Monitoring
+- Kubernetes Monitoring
+- Infrastructure Health Monitoring
+
+---
+
+# 🔐 Security Features
+
+- Private Amazon RDS
+- Security Groups
+- IAM Roles
+- Private Networking
+- Public/Private Subnet Separation
+- Least Privilege Access
+
+---
+
+# 🌟 Key Features
+
+- ✅ Infrastructure as Code using Terraform
+- ✅ End-to-End CI/CD using Jenkins
+- ✅ Dockerized Flask Application
+- ✅ Amazon RDS MySQL Integration
+- ✅ AWS Infrastructure Deployment
+- ✅ Kubernetes Deployment Ready
+- ✅ GitHub Source Control
+- ✅ Docker Hub Integration
+- ✅ Secure Networking
+- ✅ Monitoring Ready with Grafana & Prometheus
+- ✅ Configuration Automation Ready with Ansible
+
+---
+
+# 🚀 Future Enhancements
+
+- Kubernetes Ingress Controller
+- Horizontal Pod Autoscaler (HPA)
+- Helm Charts
+- ArgoCD GitOps
+- Prometheus Monitoring
+- Grafana Dashboards
+- Ansible Playbooks
+- SSL/TLS using AWS ACM
+- Route53 DNS
+- Blue-Green Deployment
+- Canary Deployment
+
+---
+
+# 📈 Learning Outcomes
+
+This project demonstrates practical experience with:
+
+- AWS Cloud
+- DevOps Practices
+- Infrastructure as Code
+- Continuous Integration
+- Continuous Deployment
+- Docker
+- Kubernetes
+- Terraform
+- Jenkins
+- GitHub
+- Linux Administration
+- Cloud Networking
+
+---
+
+# 👨‍💻 Author
+
+**Prayag Dutt**
+
+**GitHub**
+
+https://github.com/Prayag762
+
+**LinkedIn**
+
+www.linkedin.com/in/prayag-dutt
+
+---
+
+# ⭐ If you found this project useful, don't forget to Star the repository.
