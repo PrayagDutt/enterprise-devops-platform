@@ -1,4 +1,3 @@
-markdown
 <!-- ANIMATED HEADER -->
 <div align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=32&duration=3000&pause=500&color=36BCF7&center=true&vCenter=true&width=600&lines=Hello%2C+I'm+Prayag+Dutt;DevOps+Engineer;Cloud+Architect;Automation+Enthusiast" alt="Typing Animation" />
@@ -27,7 +26,7 @@ markdown
 
 ---
 
-# 📖 Project Overview
+## 📖 Project Overview
 
 The **Enterprise DevOps Task Management Platform** demonstrates a complete DevOps lifecycle from infrastructure provisioning to application deployment using modern DevOps tools and AWS cloud services.
 
@@ -35,273 +34,87 @@ The application is built using **Python Flask** with **Amazon RDS MySQL** as the
 
 The project follows enterprise DevOps practices including Infrastructure as Code, automated deployments, containerization, and cloud-native architecture.
 
-🏗 Architecture
-                               Developer
-                                   │
-                                   │ Git Push
-                                   ▼
-                           GitHub Repository
-                                   │
-                                   ▼
-                          Jenkins CI/CD Pipeline
-        ┌─────────────────────────────────────────────────┐
-        │                                                 │
-        │ Checkout Source Code                           │
-        │ Install Dependencies                           │
-        │ Run Tests                                      │
-        │ Build Docker Image                             │
-        │ Push Image to Docker Hub                       │
-        │ Deploy Latest Version                          │
-        └─────────────────────────────────────────────────┘
-                                   │
-                                   ▼
-                            Docker Hub Registry
-                                   │
-                                   ▼
-                      Kubernetes Deployment (AWS EC2)
-                 ┌───────────────────────────────────────┐
-                 │                                       │
-                 │ Replica Set                           │
-                 │ Pod 1                                │
-                 │ Pod 2                                │
-                 │ Self-Healing                         │
-                 │ Rolling Updates                      │
-                 └───────────────────────────────────────┘
-                                   │
-                         Kubernetes Service
-                                   │
-                                   ▼
-                     AWS Application Load Balancer
-                                   │
-                                   ▼
-                           Flask Web Application
-                                   │
-                    ┌──────────────┴──────────────┐
-                    ▼                             ▼
-            Amazon RDS MySQL                 Amazon S3
-          Application Database          Static Files / Storage
-
-────────────────────────────────────────────────────────────────
-
-Infrastructure Provisioning
-Terraform
-    │
-    ├── VPC
-    ├── Public Subnets
-    ├── Private Subnets
-    ├── Internet Gateway
-    ├── NAT Gateway
-    ├── Route Tables
-    ├── Security Groups
-    ├── EC2
-    ├── RDS
-    ├── S3
-    ├── IAM
-    └── Load Balancer
-
-Server Configuration
-Ansible
-    │
-    ├── Docker Installation
-    ├── Jenkins Installation
-    ├── Kubernetes Configuration
-    ├── Package Installation
-    └── Application Deployment
-
-Monitoring
-Grafana + Prometheus
-🚀 Technology Stack
-Category	Technology
-Programming Language	Python
-Framework	Flask
-Database	MySQL, Amazon RDS
-Containerization	Docker
-Container Orchestration	Kubernetes
-CI/CD	Jenkins
-Infrastructure as Code	Terraform
-Configuration Management	Ansible
-Cloud Platform	AWS
-Monitoring	Prometheus, Grafana
-Image Registry	Docker Hub
-Version Control	Git & GitHub
-☁ AWS Services Used
-Amazon EC2
-Amazon RDS (MySQL)
-Amazon VPC
-Public & Private Subnets
-Internet Gateway
-NAT Gateway
-Route Tables
-Security Groups
-Application Load Balancer
-IAM
-Amazon S3
-⚙ DevOps Workflow
-Developer
-
-      │
-
-Git Push
-
-      │
-
-GitHub
-
-      │
-
-Webhook
-
-      │
-
-Jenkins
-
-      │
-
-Build
-
-      │
-
-Docker Image
-
-      │
-
-Push
-
-      ▼
-
-Docker Hub
-
-      │
-
-Deploy
-
-      ▼
-
-Kubernetes
-
-      │
-
-Pods
-
-      │
-
-Service
-
-      │
-
-Load Balancer
-
-      ▼
-
-Flask Application
-
-      │
-
-Amazon RDS
-📂 Repository Structure
-enterprise-devops-platform/
-│
-├── Src/                     # Flask Application
-├── terraform/               # Infrastructure as Code
-├── ansible/                 # Configuration Management
-├── k8s/                     # Kubernetes Manifests
-├── Dockerfile
-├── Jenkinsfile
-├── README.md
-└── .gitignore
-✨ Key Features
-✅ End-to-End CI/CD Pipeline using Jenkins
-✅ Infrastructure Provisioning using Terraform
-✅ Configuration Management using Ansible
-✅ Dockerized Flask Application
-✅ Docker Hub Image Repository
-✅ Kubernetes Deployments
-✅ Rolling Updates
-✅ Self-Healing Pods
-✅ Replica Management
-✅ Amazon RDS Integration
-✅ Amazon S3 Integration
-✅ Application Load Balancer
-✅ Public & Private Networking
-✅ Secure Security Groups
-✅ Infrastructure Automation
-✅ Production-style DevOps Workflow
-✅ Monitoring Ready with Prometheus & Grafana
-🐳 Docker
-Build Image
-docker build -t prayag1/enterprise-devops-platform:latest .
-Push Image
-docker login
-docker push prayag1/enterprise-devops-platform:latest
-Run Container
-docker run -d \
--p 5000:5000 \
---name devops-platform \
-prayag1/enterprise-devops-platform:latest
-☸ Kubernetes
-
-Deploy Application
-
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-
-Check Pods
-
-kubectl get pods
-
-Check Services
-
-kubectl get svc
-🌍 Terraform
-
-Initialize
-
-terraform init
-
-Plan
-
-terraform plan
-
-Apply
-
-terraform apply
-⚙ Ansible
-
-Run Playbook
-
-ansible-playbook playbook.yml
-📊 Monitoring
-
-The platform is designed to integrate with:
-
-Prometheus
-Grafana
-Node Exporter
-cAdvisor
-
-These tools provide:
-
-Infrastructure Monitoring
-Container Monitoring
-CPU & Memory Utilization
-Application Health
-Kubernetes Metrics
-Alerting & Dashboards
-📈 Future Enhancements
-Kubernetes Ingress Controller
-Horizontal Pod Autoscaler
-Helm Charts
-AWS EKS Deployment
-ArgoCD GitOps
-SonarQube Integration
-Trivy Image Scanning
-AWS CloudWatch Logs
-Prometheus Alert Manager
-👨‍💻 Author
-
-Prayag Dutt
-
-DevOps Engineer | AWS | Docker | Kubernetes | Terraform | Jenkins | Ansible | Python | Linux | CI/CD
-
 ---
 
+## 🏗 Architecture Diagram
+
+```mermaid
+flowchart TB
+    subgraph Dev["👨‍💻 Development"]
+        Developer["Developer"]
+    end
+
+    subgraph CI["🔄 CI/CD Pipeline"]
+        GitHub["📦 GitHub Repository"]
+        Jenkins["⚙️ Jenkins CI/CD"]
+        DockerBuild["🐳 Build Docker Image"]
+        DockerPush["📤 Push to Docker Hub"]
+    end
+
+    subgraph K8s["☸ Kubernetes Cluster (AWS EC2)"]
+        subgraph Control["Control Plane"]
+            API["API Server"]
+            Scheduler["Scheduler"]
+        end
+        
+        subgraph Workers["Worker Nodes"]
+            Pod1["Pod 1<br/>(App Instance)"]
+            Pod2["Pod 2<br/>(App Instance)"]
+            Pod3["Pod 3<br/>(App Instance)"]
+        end
+        
+        Service["🔄 Kubernetes Service"]
+    end
+
+    subgraph AWS["☁️ AWS Cloud"]
+        ALB["⚖️ Application<br/>Load Balancer"]
+        
+        subgraph Database["🗄️ Database"]
+            RDS["Amazon RDS MySQL"]
+        end
+        
+        subgraph Storage["📁 Storage"]
+            S3["Amazon S3"]
+        end
+        
+        subgraph IaC["🏗️ Infrastructure"]
+            Terraform["Terraform"]
+            Ansible["Ansible"]
+        end
+    end
+
+    subgraph Monitoring["📊 Monitoring"]
+        Prometheus["📈 Prometheus"]
+        Grafana["📉 Grafana"]
+    end
+
+    Developer -->|Git Push| GitHub
+    GitHub -->|Webhook Trigger| Jenkins
+    Jenkins -->|Checkout Code| GitHub
+    Jenkins -->|Build| DockerBuild
+    DockerBuild -->|Push| DockerPush
+    DockerPush -->|Deploy| K8s
+    
+    K8s -->|Expose| Service
+    Service -->|Route Traffic| ALB
+    ALB -->|User Access| Developer
+    
+    K8s -->|Store Data| RDS
+    K8s -->|Store Files| S3
+    
+    Terraform -->|Provision| AWS
+    Ansible -->|Configure| K8s
+    
+    K8s -->|Scrape Metrics| Prometheus
+    Prometheus -->|Visualize| Grafana
+
+    style Dev fill:#e3f2fd,stroke:#1565c0
+    style CI fill:#f3e5f5,stroke:#6a1b9a
+    style K8s fill:#e8f5e9,stroke:#2e7d32
+    style Control fill:#fff3e0,stroke:#e65100
+    style Workers fill:#fce4ec,stroke:#c62828
+    style AWS fill:#e8f5e9,stroke:#2e7d32
+    style Database fill:#fff8e1,stroke:#f57f17
+    style Storage fill:#e0f7fa,stroke:#00695c
+    style IaC fill:#f3e5f5,stroke:#7b1fa2
+    style Monitoring fill:#e0f7fa,stroke:#00695c
