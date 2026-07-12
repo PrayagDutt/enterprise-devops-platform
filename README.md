@@ -191,8 +191,6 @@ Resources Created
 ## ⚙ Technology Stack
 | Category | Technologies |
 |---|---|
-| Programming Language | Python |
-| Framework | Flask |
 | Database | MySQL, Amazon RDS |
 | Containerization | Docker |
 | Container Orchestration | Kubernetes |
