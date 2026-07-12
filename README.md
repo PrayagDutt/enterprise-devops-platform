@@ -211,6 +211,10 @@ The complete AWS infrastructure is provisioned using Terraform.
 ```text
 enterprise-devops-platform/
 │
+├── App_Login_Screenshot          # APP SCREENSHOTS
+│   ├── APP_HOME_PAGE/
+│   ├── APP_LOGIN_PAGE/
+│
 ├── Src/                          # Flask Application
 │   ├── app/
 │   ├── migrations/
