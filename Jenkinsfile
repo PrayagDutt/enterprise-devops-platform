@@ -3,7 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "prayag1/enterprise-devops-platform"
-        IMAGE_TAG = "latest"
+        IMAGE_TAG  = "${BUILD_NUMBER}"
+        K8S_NAMESPACE = "default"
     }
 
     stages {
@@ -16,7 +17,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+                sh '''
+                    docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                    docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+                '''
             }
         }
 
@@ -30,7 +34,9 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        echo "$DOCKER_PASS" | docker login \
+                        -u "$DOCKER_USER" \
+                        --password-stdin
                     '''
                 }
             }
@@ -38,32 +44,45 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                sh 'docker push $IMAGE_NAME:$IMAGE_TAG'
+                sh '''
+                    docker push $IMAGE_NAME:$IMAGE_TAG
+                    docker push $IMAGE_NAME:latest
+                '''
             }
         }
 
-        stage('Deploy Container') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                docker stop devops-platform || true
-                docker rm devops-platform || true
+                withKubeConfig(
+                    credentialsId: 'kubernetes-cluster'
+                ) {
+                    sh '''
+                        kubectl apply -f kubernetes/deployment.yaml
+                        kubectl apply -f kubernetes/service.yaml
 
-                docker run -d \
-                  --name devops-platform \
-                  -p 5000:5000 \
-                  $IMAGE_NAME:$IMAGE_TAG
-                '''
+                        kubectl set image deployment/enterprise-devops-platform \
+                        enterprise-devops-platform=$IMAGE_NAME:$IMAGE_TAG \
+                        -n $K8S_NAMESPACE
+
+                        kubectl rollout status deployment/enterprise-devops-platform \
+                        -n $K8S_NAMESPACE
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Docker image built, pushed, and deployed to Kubernetes successfully!'
         }
 
         failure {
             echo 'Pipeline Failed!'
+        }
+
+        always {
+            sh 'docker logout || true'
         }
     }
 }
